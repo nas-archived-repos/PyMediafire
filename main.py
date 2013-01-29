@@ -12,7 +12,7 @@ class Mediafire:
 		self.api_key = api_key
 		self.response_format = response_format
 
-	def Authenticate(self):
+	def get_session_token(self):
 		signature = hashlib.sha1(self.email+self.password+self.application_id+self.api_key).hexdigest()
 		parameters = {'email':self.email,'password':self.password,'application_id':self.application_id,'signature':signature,'response_format':self.response_format}
 		r = requests.get("https://www.mediafire.com/api/user/get_session_token.php",params=parameters)
