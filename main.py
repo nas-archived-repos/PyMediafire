@@ -1,9 +1,11 @@
 import requests,hashlib,getpass,json
+
 email =""
 password = ""
 application_id = ""
 api_key = ""
 response_format = "json"
+
 class Mediafire:
 	def __init__(self,email,password,application_id,api_key,response_format="json"):
 		self.email = email
@@ -12,8 +14,7 @@ class Mediafire:
 		self.api_key = api_key
 		self.response_format = response_format
 		self.signature = hashlib.sha1(self.email+self.password+self.application_id+self.api_key).hexdigest()
-		
-		self.login_url = "http://www.mediafire.com/api/user/login_with_token.php?login_token="
+		self.session_token=""
 
 
 	def get_session_token(self):
@@ -106,12 +107,30 @@ class Mediafire:
 			print json['message']
 		else:
 			if (content_type == 'files'):
-				for x in json['folder_content']['files']:
-					print x['filename']
+				return json['folder_content']['files']
 
 			else:
-				for x in json['folder_content']['folders']:
-					print x['name']
+				return['folder_content']['folders']
+
+	def file_get_info(self,quick_key):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'quick_key':quick_key}
+		r = requests.get("http://www.mediafire.com/api/file/get_info.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			return json['file_info']
+
+	def file_delete(self,quick_key):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'quick_key':quick_key}
+		r = requests.get("http://www.mediafire.com/api/file/delete.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print "Deleted " + quick_key
+
+
 
 mediafire = Mediafire(email,password,application_id,api_key,response_format)
 mediafire.get_session_token()
