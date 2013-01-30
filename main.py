@@ -110,7 +110,7 @@ class Mediafire:
 				return json['folder_content']['files']
 
 			else:
-				return['folder_content']['folders']
+				return json['folder_content']['folders']
 
 	def file_get_info(self,quick_key):
 		parameters = {'session_token':self.session_token,'response_format':self.response_format,'quick_key':quick_key}
@@ -129,6 +129,15 @@ class Mediafire:
 			print json['message']
 		else:
 			print "Deleted " + quick_key
+
+	def file_move(self,quick_key,folder_key=''):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'quick_key':quick_key,'folder_key':folder_key}
+		r = requests.get("http://www.mediafire.com/api/file/move.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print "Moved " + quick_key + " to " + folder_key
 
 
 
