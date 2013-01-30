@@ -2,7 +2,7 @@ import requests,hashlib,getpass,json
 email =""
 password = ""
 application_id = ""
-api_key = ''
+api_key = ""
 response_format = "json"
 class Mediafire:
 	def __init__(self,email,password,application_id,api_key,response_format="json"):
