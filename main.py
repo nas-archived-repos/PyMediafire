@@ -98,7 +98,7 @@ class Mediafire:
 		else:
 			print "Accepted the TOS succesfully"
 
-	def get_content(self,content_type='files',order_by='name',order_direction='asc',chunk='1'):
+	def get_content(self,content_type='files',order_by='name',order_direction='asc',chunk='1'): #Unfinished
 		parameters = {'session_token':self.session_token,'response_format':self.response_format,'content_type':content_type,'order_by':order_by,'order_direction':order_direction,'chunk':chunk}
 	 	r = requests.get("http://www.mediafire.com/api/folder/get_content.php", params = parameters)
 		json = r.json()['response']
