@@ -98,7 +98,6 @@ class Mediafire:
 		else:
 			print "Accepted the TOS succesfully"
 
-	#File functions
 			
 	 
 
