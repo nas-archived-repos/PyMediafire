@@ -99,8 +99,8 @@ class Mediafire:
 		else:
 			print "Accepted the TOS succesfully"
 
-	def get_content(self,content_type='files',order_by='name',order_direction='asc',chunk='1'): #Unfinished
-		parameters = {'session_token':self.session_token,'response_format':self.response_format,'content_type':content_type,'order_by':order_by,'order_direction':order_direction,'chunk':chunk}
+	def get_content(self,content_type='files',folder_key='',order_by='name',order_direction='asc',chunk='1'): #Unfinished
+		parameters = {'session_token':self.session_token,'folder_key':folder_key,'response_format':self.response_format,'content_type':content_type,'order_by':order_by,'order_direction':order_direction,'chunk':chunk}
 	 	r = requests.get("http://www.mediafire.com/api/folder/get_content.php", params = parameters)
 		json = r.json()['response']
 		if (json['result'] == 'Error'):
@@ -139,6 +139,51 @@ class Mediafire:
 		else:
 			print "Moved " + quick_key + " to " + folder_key
 
+	def file_update(self,quick_key,filename,description,tags,privacy,note_subject,note_description):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'quick_key':quick_key,'filename':filename,'description':description,'tags':tags,'privacy':privacy,'note_subject':note_subject,'note_description':note_description}
+		r = requests.get("http://www.mediafire.com/api/file/update.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print "Changed the info for " + quick_key
+
+	def file_update_password(self,quick_key,password=""):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'quick_key':quick_key,'password':password}
+		r = requests.get("http://www.mediafire.com/api/file/update_password.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print "Changed the password for " + quick_key
+
+	def file_update_file(self,from_quickkey,to_quickkey):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'from_quickkey':from_quickkey,'to_quickkey':to_quickkey}
+		r = requests.get("http://www.mediafire.com/api/file/update_file.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print "Update the quickkey for " + from_quickkey +" to " + to_quickkey
+
+	def file_copy(self,quick_key,folder_key=''):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'quick_key':quick_key,'folder_key':folder_key}
+		r = requests.get("http://www.mediafire.com/api/file/copy.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print "Copied " + quick_key +" to " + folder_key
+			return json['new_quickkeys']
+
+	def file_get_links(self,quick_key,link_type=''):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'quick_key':quick_key,'link_type':link_type}
+		r = requests.get("http://www.mediafire.com/api/file/get_links.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			return json['links']
 
 
 mediafire = Mediafire(email,password,application_id,api_key,response_format)
