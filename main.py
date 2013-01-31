@@ -3,9 +3,8 @@ import requests,hashlib,getpass,json
 email =""
 password = ""
 application_id = ""
-api_key = ""
+api_key = ''
 response_format = "json"
-
 class Mediafire:
 	def __init__(self,email,password,application_id,api_key,response_format="json"):
 		self.email = email
@@ -185,6 +184,35 @@ class Mediafire:
 		else:
 			return json['links']
 
+	def file_collaborate(self,quick_key='',emails='',duration='',message='',public='no',email_notification='no'):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'quick_key':quick_key,'emails':emails,'duration':duration,'message':message,'public':public,'email_notification':email_notification}
+		r = requests.get("http://www.mediafire.com/api/file/collaborate.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			return json['collaboration_links'][0]['link']
+
+	def file_one_time_download(self,quick_key,get_counts_only='no',duration='',email_notification='no',burn_after_use='yes',success_callback_url='',error_calback_url='',bind_ip=''):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'quick_key':quick_key,'get_counts_only':get_counts_only,'duration':duration,'email_notification':email_notification,'success_callback_url':success_callback_url,'error_calback_url':error_calback_url,'bind_ip':bind_ip,'burn_after_use':burn_after_use}
+		r = requests.get("http://www.mediafire.com/api/file/one_time_download.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			return {'link':json['one_time_download'],'token':json['token']}
+
+	def file_configure_one_time_download(self,token,duration='',email_notification='no',burn_after_use='yes',success_callback_url='',error_calback_url='',bind_ip=''): #Doesn't work for some reason
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'token':token,'duration':duration,'email_notification':email_notification,'success_callback_url':success_callback_url,'error_calback_url':error_calback_url,'bind_ip':bind_ip,'burn_after_use':burn_after_use}
+		r = requests.get("http://www.mediafire.com/api/file/configure_one_time_download.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print "succesfully changed the " + token + " one time download"
 
 mediafire = Mediafire(email,password,application_id,api_key,response_format)
 mediafire.get_session_token()
+for file in mediafire.get_content('files'):
+	print file
+
