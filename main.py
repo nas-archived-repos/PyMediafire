@@ -209,10 +209,59 @@ class Mediafire:
 		if (json['result'] == 'Error'):
 			print json['message']
 		else:
-			print "succesfully changed the " + token + " one time download"
+			print "Succesfully changed the " + token + " one time download"
+
+	def folder_get_info(self,folder_key):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'folder_key':folder_key}
+		r = requests.get("http://www.mediafire.com/api/folder/get_info.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			return json['folder_info']
+
+	def folder_delete(self,folder_key):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'folder_key':folder_key}
+		r = requests.get("http://www.mediafire.com/api/folder/delete.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print "Deleted " + folder_key
+
+	def folder_move(self,folder_key_src,folder_key_dst=''):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'folder_key_src':folder_key_src,'folder_key_dst':folder_key_dst}
+		r = requests.get("http://www.mediafire.com/api/folder/move.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print "Moved " + folder_key_src +" to " + folder_key_dst
+
+	def folder_create(self,foldername,parent_key=''):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'foldername':foldername,'parent_key':parent_key}
+		r = requests.get("http://www.mediafire.com/api/folder/create.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print "Created " + foldername
+			return json['upload_key']
+
+	def folder_update(self,folder_key,foldername='',description='',tags='',privacy='',privacy_recursive='',note_subject='',note_description=''): #GOTTA FINISH THIS
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'foldername':foldername,'parent_key':parent_key}
+		r = requests.get("http://www.mediafire.com/api/folder/create.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print "Created " + foldername
+			return json['upload_key']
+
+
 
 mediafire = Mediafire(email,password,application_id,api_key,response_format)
 mediafire.get_session_token()
-for file in mediafire.get_content('files'):
+for file in mediafire.get_content('folders'):
 	print file
 
