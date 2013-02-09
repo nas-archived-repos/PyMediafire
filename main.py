@@ -1,5 +1,4 @@
 import requests,hashlib,getpass,json
-
 email =""
 password = ""
 application_id = ""
@@ -248,15 +247,55 @@ class Mediafire:
 			print "Created " + foldername
 			return json['upload_key']
 
-	def folder_update(self,folder_key,foldername='',description='',tags='',privacy='',privacy_recursive='',note_subject='',note_description=''): #GOTTA FINISH THIS
-		parameters = {'session_token':self.session_token,'response_format':self.response_format,'foldername':foldername,'parent_key':parent_key}
-		r = requests.get("http://www.mediafire.com/api/folder/create.php",params = parameters)
+	def folder_update(self,folder_key,foldername='',description='',tags='',privacy='',privacy_recursive='',note_subject='',note_description=''):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'folder_key':folder_key,'foldername':foldername,'description':description,'tags':tags,'privacy':privacy,'privacy_recursive':privacy_recursive,'note_subject':note_subject,'note_description':note_description}
+		r = requests.get("http://www.mediafire.com/api/folder/update.php",params = parameters)
 		json = r.json()['response']
 		if (json['result'] == 'Error'):
 			print json['message']
 		else:
-			print "Created " + foldername
-			return json['upload_key']
+			print "Updated " + foldername
+			
+
+	def folder_attach_foreign(self,folder_key): #Not tested
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'folder_key':folder_key}
+		r = requests.get("http://www.mediafire.com/api/folder/attach_foreign.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print 'Succesfully attached ' + folder_key
+
+	def folder_detach_foreign(self,folder_key): #Not tested
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'folder_key':folder_key}
+		r = requests.get("http://www.mediafire.com/api/folder/detach_foreign.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print 'Succesfully detached ' + folder_key
+
+	def folder_get_depth(self,folder_key):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'folder_key':folder_key}
+		r = requests.get("http://www.mediafire.com/api/folder/get_depth.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print json['folder_depth']
+			return json['folder_depth']['depth']
+
+	def folder_get_siblings(self,folder_key):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'folder_key':folder_key}
+		r = requests.get("http://www.mediafire.com/api/folder/get_depth.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			print json['folder_depth']
+			return json['folder_depth']['depth']
+
+
 
 
 
@@ -264,4 +303,3 @@ mediafire = Mediafire(email,password,application_id,api_key,response_format)
 mediafire.get_session_token()
 for file in mediafire.get_content('folders'):
 	print file
-
