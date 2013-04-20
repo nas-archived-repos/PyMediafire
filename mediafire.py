@@ -98,7 +98,7 @@ class Mediafire_User:
 		else:
 			print "Accepted the TOS succesfully"
 
-	def get_content(self,content_type='files',folder_key='',order_by='name',order_direction='asc',chunk='1'): #Unfinished
+	def get_content(self,content_type='files',folder_key='',order_by='name',order_direction='asc',chunk='1'): 
 		parameters = {'session_token':self.session_token,'folder_key':folder_key,'response_format':self.response_format,'content_type':content_type,'order_by':order_by,'order_direction':order_direction,'chunk':chunk}
 	 	r = requests.get("http://www.mediafire.com/api/folder/get_content.php", params = parameters)
 		json = r.json()['response']
@@ -127,6 +127,27 @@ class Mediafire_User:
 		else:
 			return Mediafire_Folder(self.session_token,json['folder_key'])
 
+	def upload(self,file):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format}
+		file = {'file':open(file,'r')}
+		r = requests.post("http://www.mediafire.com/api/upload/upload.php", files=file,params=parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			return json['doupload']['key']
+
+
+	def poll_upload(self,key):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'key':key}
+		r = requests.get("http://www.mediafire.com/api/upload/poll_upload.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		elif (json['doupload']['quickkey']):
+			return Mediafire_File (self.session_token,json['doupload']['quickkey'])			
+		else:
+			print json['doupload']['description']
 
 
 
@@ -238,6 +259,17 @@ class Mediafire_File:
 		else:
 			print "Succesfully changed the " + token + " one time download"
 
+	def download(self):
+		parameters = {'session_token':self.session_token,'response_format':self.response_format,'quick_key':self.quick_key}
+		r = requests.get("http://www.mediafire.com/api/file/get_links.php",params = parameters)
+		json = r.json()['response']
+		if (json['result'] == 'Error'):
+			print json['message']
+		else:
+			return json['links'][0]['direct_download']
+
+
+
 class Mediafire_Folder:
 	def __init__(self,session_token,folder_key):
 		self.folder_key = folder_key
@@ -325,7 +357,6 @@ class Mediafire_Folder:
 		if (json['result'] == 'Error'):
 			print json['message']
 		else:
-			print json['results']
 			return json['results']
 
 
