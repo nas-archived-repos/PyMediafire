@@ -2,7 +2,8 @@ import requests,hashlib,json
 email =""
 password = ""
 application_id = ""
-api_key = ''
+api_key = ""
+
 class Mediafire_User:
 	def __init__(self,email,password,application_id,api_key):
 		self.email = email
@@ -105,11 +106,18 @@ class Mediafire_User:
 			print json['message']
 		else:
 			if (content_type == 'files'):
-				return json['folder_content']['files']
-
+				files = []
+				for x in json['folder_content']['files']:
+					file = Mediafire_File(self.session_token,x['quickkey'])
+					files.append(file)
+				return files				
 			else:
-				return json['folder_content']['folders']
-
+				folders = []
+				for x in json['folder_content']['folders']:
+					folder = Mediafire_Folder(self.session_token,x['folderkey'])
+					folders.append(folder)
+				return folders
+				 
 	def folder_create(self,foldername,parent_key=''):
 		parameters = {'session_token':self.session_token,'response_format':self.response_format,'foldername':foldername,'parent_key':parent_key}
 		r = requests.get("http://www.mediafire.com/api/folder/create.php",params = parameters)
@@ -117,8 +125,10 @@ class Mediafire_User:
 		if (json['result'] == 'Error'):
 			print json['message']
 		else:
-			print "Created " + foldername
-			return json['upload_key']
+			return Mediafire_Folder(self.session_token,json['folder_key'])
+
+
+
 
 
 class Mediafire_File:
@@ -134,7 +144,7 @@ class Mediafire_File:
 		if (json['result'] == 'Error'):
 			print json['message']
 		else:
-			return json['info']
+			return json['file_info']
 
 	def delete(self):
 		parameters = {'session_token':self.session_token,'response_format':self.response_format,'quick_key':self.quick_key}
@@ -318,11 +328,4 @@ class Mediafire_Folder:
 			print json['results']
 			return json['results']
 
-
-
-
-mediafire = Mediafire_User(email,password,application_id,api_key)
-mediafire.get_session_token()
-for file in mediafire.get_content('folders'):
-	print file
 
