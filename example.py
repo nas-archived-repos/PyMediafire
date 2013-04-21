@@ -1,4 +1,4 @@
-from mediafire import user
+from mediafire import Mediafire_User
 email =""
 password = ""
 application_id = ""
