@@ -1,4 +1,5 @@
 from mediafire import Mediafire_User
+#Replace blanks with appropriate data 
 email =""
 password = ""
 application_id = ""
